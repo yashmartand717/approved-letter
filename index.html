@@ -65,8 +65,12 @@ textarea{resize:vertical;min-height:64px;line-height:1.45}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--accent);color:var(--accent-fg);padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;max-width:calc(100% - 32px)}
 
 /* ---------- The letter (A4 @ 96dpi = 794 x 1123) ---------- */
-.page{width:794px;height:1123px;background:var(--paper);color:var(--ink);display:flex;flex-direction:column;font-family:var(--serif);overflow:hidden}
-.lh{background:#ffffff;color:var(--ink);padding:30px 0 18px;margin:0 56px;border-bottom:1px solid #141518;position:relative}
+.page{position:relative;width:794px;height:1123px;background:var(--paper);color:var(--ink);display:flex;flex-direction:column;font-family:var(--serif);overflow:hidden}
+.wm{position:absolute;left:0;right:0;top:300px;text-align:center;opacity:.06;pointer-events:none;z-index:0}
+.wm img{width:380px;height:auto;display:block;margin:0 auto}
+.wm div{margin-top:22px;font-family:var(--ui);font-weight:600;font-size:30px;letter-spacing:.14em;line-height:1.25;color:#141518}
+.lh,.lt-body,.lf{position:relative;z-index:1}
+.lh{background:transparent;color:var(--ink);padding:30px 0 18px;margin:0 56px;border-bottom:1px solid #141518;position:relative}
 .lh-in{display:flex;align-items:center;gap:22px;position:relative}
 .lh img{width:78px;height:auto;display:block}
 .lh-name{font-family:var(--ui);font-weight:600;font-size:21px;letter-spacing:.14em;line-height:1.2;color:#141518}
@@ -99,7 +103,7 @@ ol.lst li,ul.lst li{margin:.12em 0}
 .accept{font-size:.85em;color:var(--ink-soft);text-align:right;line-height:1.5}
 .accept .ln{display:inline-block;width:180px;border-bottom:1px solid var(--ink-soft);margin-top:30px}
 
-.lf{background:#ffffff;color:#4a4f58;border-top:1px solid #141518;margin:0 56px;padding-left:0!important;padding-right:0!important;font-family:var(--ui);font-size:9.3px;letter-spacing:.03em;padding:11px 44px;display:flex;justify-content:space-between;gap:16px;line-height:1.55}
+.lf{background:transparent;color:#4a4f58;border-top:1px solid #141518;margin:0 56px;padding-left:0!important;padding-right:0!important;font-family:var(--ui);font-size:9.3px;letter-spacing:.03em;padding:11px 44px;display:flex;justify-content:space-between;gap:16px;line-height:1.55}
 .lf b{color:#141518;font-weight:600}
 .lf .r{text-align:right}
 
@@ -269,6 +273,7 @@ function letterHTML(){
   if(s.end)row("Target Completion",esc(fmtDate(s.end))+(months(s.start,s.end)?` <span style="color:var(--ink-soft)">(${months(s.start,s.end)})</span>`:""));
   const del=lines(s.deliverables),terms=lines(s.terms);
   return `
+  <div class="wm"><img src="${LOGO}" alt=""><div>MYCELIUM DYNAMICS<br>PRIVATE LIMITED</div></div>
   <div class="lh"><div class="lh-in">
     <img src="${LOGO}" alt="">
     <div><div class="lh-name">MYCELIUM DYNAMICS<br>PRIVATE LIMITED</div><div class="lh-rule"></div><div class="lh-cin">CIN: ${CO.cin}</div></div>
