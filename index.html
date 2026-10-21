@@ -53,8 +53,6 @@ input,textarea,select{font:inherit;font-size:13.5px;color:var(--fg);background:v
 textarea{resize:vertical;min-height:64px;line-height:1.45}
 .hint{font-size:11.5px;color:var(--muted);margin:2px 0 0}
 .words{font-size:11.5px;color:var(--muted);font-style:italic}
-.sigrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.sigrow img{height:34px;background:#fff;border:1px solid var(--line);border-radius:4px;padding:2px}
 
 .stage{position:sticky;top:16px;min-width:0}
 .stagebar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;font-size:12px;color:var(--muted);flex-wrap:wrap}
@@ -96,10 +94,6 @@ ol.lst,ul.lst{margin:0;padding-left:1.35em}
 ol.lst li,ul.lst li{margin:.12em 0}
 .sign{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;padding-top:.4em}
 .sign .for{font-weight:600}
-.sign .sigimg{height:52px;margin:6px 0 2px;display:block}
-.sign .sigspace{height:46px}
-.sign .nm{font-weight:600;border-top:1px solid var(--ink);padding-top:.25em;display:inline-block;min-width:200px}
-.sign .ds{color:var(--ink-soft);font-size:.92em}
 .accept{font-size:.85em;color:var(--ink-soft);text-align:right;line-height:1.5}
 .accept .ln{display:inline-block;width:180px;border-bottom:1px solid var(--ink-soft);margin-top:30px}
 
@@ -174,18 +168,6 @@ ol.lst li,ul.lst li{margin:.12em 0}
       </div>
     </details>
 
-    <details open>
-      <summary>Signatory</summary>
-      <div class="grid">
-        <label>Name<input id="signName" name="signName"></label>
-        <label>Designation<input id="signDesig" name="signDesig"></label>
-        <div class="full sigrow">
-          <label style="flex:1">Signature / stamp image (PNG with transparent background works best)<input id="sigFile" type="file" accept="image/*"></label>
-          <img id="sigThumb" alt="Signature preview" hidden>
-          <button type="button" id="sigClear" hidden>Remove</button>
-        </div>
-      </div>
-    </details>
   </form>
 
   <section class="stage" aria-label="Letter preview">
@@ -231,11 +213,11 @@ const SAMPLE={
   payment:"40% advance, 40% on UAT sign-off, 20% on go-live",
   start:addDays(today(),7),end:addDays(today(),97),
   deliverables:"UI/UX design for web and mobile views\nWeb application with admin and staff modules\nDeployment on client cloud with SSL\nUser manual and 3 months of post-launch support",
-  ...DEFAULT_TEXT,showAccept:true,signName:"Authorised Signatory",signDesig:"Director",sig:""
+  ...DEFAULT_TEXT,showAccept:true
 };
 
 const $=id=>document.getElementById(id);
-const F=["ref","date","contact","contactDesig","client","clientAddr","clientMobile","project","projectId","proposalRef","scope","amount","tax","payment","start","end","deliverables","opening","terms","closing","signName","signDesig"];
+const F=["ref","date","contact","contactDesig","client","clientAddr","clientMobile","project","projectId","proposalRef","scope","amount","tax","payment","start","end","deliverables","opening","terms","closing"];
 let state={},counter=1;
 
 function load(){
@@ -243,7 +225,7 @@ function load(){
   state={...SAMPLE};
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify({state,counter}))}catch(e){}}
-function fill(){F.forEach(k=>{$(k).value=state[k]??""});$("showAccept").checked=!!state.showAccept;sigUI()}
+function fill(){F.forEach(k=>{$(k).value=state[k]??""});$("showAccept").checked=!!state.showAccept}
 
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const nl=s=>esc(s).replace(/\n/g,"<br>");
@@ -300,9 +282,6 @@ function letterHTML(){
       <div>
         <div>${s.contact?"Yours sincerely,":"Yours faithfully,"}</div>
         <div class="for">For ${CO.name}</div>
-        ${s.sig?`<img class="sigimg" src="${s.sig}" alt="">`:`<div class="sigspace"></div>`}
-        <div class="nm">${esc(s.signName)}</div>
-        <div class="ds">${esc(s.signDesig)}</div>
       </div>
       ${s.showAccept?`<div class="accept">Accepted on behalf of ${esc(s.client||"the client")}<br><span class="ln"></span><br>Signature, name &amp; date</div>`:""}
     </div>
@@ -333,25 +312,19 @@ function render(){
 function scale(){const w=$("wrap").clientWidth,k=w/794;$("page").style.transform=`scale(${k})`;$("wrap").style.height=1123*k+"px"}
 
 function toast(t){const el=$("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,3200)}
-function sigUI(){const has=!!state.sig;$("sigThumb").hidden=!has;$("sigClear").hidden=!has;if(has)$("sigThumb").src=state.sig}
 
 $("f").addEventListener("input",e=>{
-  const t=e.target;if(t.id==="sigFile")return;
+  const t=e.target;
   if(t.id==="showAccept")state.showAccept=t.checked;else if(F.includes(t.id))state[t.id]=t.value;
   save();render();
 });
 $("f").addEventListener("submit",e=>e.preventDefault());
-$("sigFile").addEventListener("change",e=>{
-  const file=e.target.files[0];if(!file)return;
-  const r=new FileReader();r.onload=()=>{state.sig=r.result;save();sigUI();render()};r.readAsDataURL(file);
-});
-$("sigClear").addEventListener("click",()=>{state.sig="";$("sigFile").value="";save();sigUI();render()});
 
 $("btnNew").addEventListener("click",()=>{
   counter+=1;
   state={...state,ref:refFor(counter),date:today(),contact:"",contactDesig:"",client:"",clientAddr:"",clientMobile:"",
     project:"",projectId:"",proposalRef:"",scope:"",amount:"",payment:"",start:"",end:"",deliverables:""};
-  save();fill();render();toast("Started "+state.ref+". Signatory, terms and wording were kept.");
+  save();fill();render();toast("Started "+state.ref+". Terms and wording were kept.");
   $("contact").focus();
 });
 
@@ -395,8 +368,6 @@ We are pleased to confirm that the project "${s.project||""}" has been approved.
 Kindly review the letter and share your acceptance at the earliest so we can proceed to the next steps.
 
 Warm regards,
-${s.signName||""}
-${s.signDesig||""}
 ${CO.name}
 ${CO.email} | ${CO.mobile}`;
   const done=()=>toast("Email text copied. Paste it into your mail and attach the PDF.");
