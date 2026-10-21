@@ -168,6 +168,14 @@ ol.lst li,ul.lst li{margin:.12em 0}
       </div>
     </details>
 
+    <details open>
+      <summary>Closing lines</summary>
+      <div class="grid">
+        <label class="full">Salutation<input id="closingSalutation" name="closingSalutation"></label>
+        <label class="full">Company line<input id="closingCompany" name="closingCompany"></label>
+        <span class="full hint">Edit either line, or leave it blank to hide it.</span>
+      </div>
+    </details>
   </form>
 
   <section class="stage" aria-label="Letter preview">
@@ -213,15 +221,15 @@ const SAMPLE={
   payment:"40% advance, 40% on UAT sign-off, 20% on go-live",
   start:addDays(today(),7),end:addDays(today(),97),
   deliverables:"UI/UX design for web and mobile views\nWeb application with admin and staff modules\nDeployment on client cloud with SSL\nUser manual and 3 months of post-launch support",
-  ...DEFAULT_TEXT,showAccept:true
+  ...DEFAULT_TEXT,closingSalutation:"Yours sincerely,",closingCompany:`For ${CO.name}`,showAccept:true
 };
 
 const $=id=>document.getElementById(id);
-const F=["ref","date","contact","contactDesig","client","clientAddr","clientMobile","project","projectId","proposalRef","scope","amount","tax","payment","start","end","deliverables","opening","terms","closing"];
+const F=["ref","date","contact","contactDesig","client","clientAddr","clientMobile","project","projectId","proposalRef","scope","amount","tax","payment","start","end","deliverables","opening","terms","closing","closingSalutation","closingCompany"];
 let state={},counter=1;
 
 function load(){
-  try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.state){state={...SAMPLE,...s.state};counter=s.counter||1;return}}catch(e){}
+  try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.state){state={...SAMPLE,...s.state};state.closingSalutation=s.state.closingSalutation??(state.contact?"Yours sincerely,":"Yours faithfully,");counter=s.counter||1;return}}catch(e){}
   state={...SAMPLE};
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify({state,counter}))}catch(e){}}
@@ -280,8 +288,8 @@ function letterHTML(){
     ${s.closing?`<p>${nl(tok(s.closing))}</p>`:""}
     <div class="sign">
       <div>
-        <div>${s.contact?"Yours sincerely,":"Yours faithfully,"}</div>
-        <div class="for">For ${CO.name}</div>
+        ${s.closingSalutation?`<div>${esc(s.closingSalutation)}</div>`:""}
+        ${s.closingCompany?`<div class="for">${esc(s.closingCompany)}</div>`:""}
       </div>
       ${s.showAccept?`<div class="accept">Accepted on behalf of ${esc(s.client||"the client")}<br><span class="ln"></span><br>Signature, name &amp; date</div>`:""}
     </div>
