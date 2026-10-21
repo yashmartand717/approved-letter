@@ -142,7 +142,7 @@ ol.lst li,ul.lst li{margin:.12em 0}
         <label>Designation<input id="contactDesig" name="contactDesig"></label>
         <label class="full">Client company<input id="client" name="client"></label>
         <label class="full">Address<textarea id="clientAddr" name="clientAddr" rows="2"></textarea></label>
-        <label class="full">Email<input id="clientEmail" name="clientEmail" type="email"></label>
+        <label class="full">Mobile number<input id="clientMobile" name="clientMobile" type="tel" inputmode="tel" autocomplete="tel"></label>
       </div>
     </details>
 
@@ -224,7 +224,7 @@ const DEFAULT_TEXT={
 const SAMPLE={
   ref:refFor(1),date:today(),
   contact:"Mr. Rohan Mehta",contactDesig:"Director",client:"Example Client Pvt. Ltd.",
-  clientAddr:"Plot 12, Sector 62,\nNoida, Uttar Pradesh – 201309",clientEmail:"rohan@example.com",
+  clientAddr:"Plot 12, Sector 62,\nNoida, Uttar Pradesh – 201309",clientMobile:"",
   project:"Inventory Management Web Platform",projectId:"MDPL-PRJ-001",proposalRef:"Proposal No. MDPL/PR/045 dated 05 Oct 2026",
   scope:"Design, development and deployment of a cloud-based inventory management web application with role-based access, real-time stock tracking and reporting dashboard.",
   amount:"450000",tax:"Exclusive of GST @ 18%",
@@ -235,7 +235,7 @@ const SAMPLE={
 };
 
 const $=id=>document.getElementById(id);
-const F=["ref","date","contact","contactDesig","client","clientAddr","clientEmail","project","projectId","proposalRef","scope","amount","tax","payment","start","end","deliverables","opening","terms","closing","signName","signDesig"];
+const F=["ref","date","contact","contactDesig","client","clientAddr","clientMobile","project","projectId","proposalRef","scope","amount","tax","payment","start","end","deliverables","opening","terms","closing","signName","signDesig"];
 let state={},counter=1;
 
 function load(){
@@ -287,7 +287,7 @@ function letterHTML(){
       ${s.contact?`<div><b>${esc(s.contact)}</b>${s.contactDesig?", "+esc(s.contactDesig):""}</div>`:""}
       ${s.client?`<div>${esc(s.client)}</div>`:""}
       ${s.clientAddr?`<div>${nl(s.clientAddr)}</div>`:""}
-      ${s.clientEmail?`<div style="color:var(--ink-soft)">${esc(s.clientEmail)}</div>`:""}
+      ${s.clientMobile?`<div style="color:var(--ink-soft)">Mobile: ${esc(s.clientMobile)}</div>`:""}
     </div>
     <div class="subj"><span>Subject:</span>Approval of Project – ${esc(s.project||"")}</div>
     <p>Dear ${esc(s.contact||"Sir/Madam")},</p>
@@ -349,7 +349,7 @@ $("sigClear").addEventListener("click",()=>{state.sig="";$("sigFile").value="";s
 
 $("btnNew").addEventListener("click",()=>{
   counter+=1;
-  state={...state,ref:refFor(counter),date:today(),contact:"",contactDesig:"",client:"",clientAddr:"",clientEmail:"",
+  state={...state,ref:refFor(counter),date:today(),contact:"",contactDesig:"",client:"",clientAddr:"",clientMobile:"",
     project:"",projectId:"",proposalRef:"",scope:"",amount:"",payment:"",start:"",end:"",deliverables:""};
   save();fill();render();toast("Started "+state.ref+". Signatory, terms and wording were kept.");
   $("contact").focus();
